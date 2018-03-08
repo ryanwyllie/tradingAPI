@@ -2,8 +2,8 @@ import {Router, Request, Response, NextFunction} from 'express';
 import ExchangeClientFactoryInterface from '../factories/ExchangeClientFactoryInterface'
 
 class OrderRouter {
-  router: Router
-  exchangeClientFactory: ExchangeClientFactoryInterface
+  private router: Router
+  private exchangeClientFactory: ExchangeClientFactoryInterface
 
   /**
    * Initialize the OrderRouter
@@ -14,8 +14,12 @@ class OrderRouter {
     this.init();
   }
 
-  public initialiseClient(req: Request, res: Response, next: NextFunction) {
-    let clientType: string = req.params.exchange
+  public getRouter() : Router {
+    return this.router
+  }
+
+  public initialiseExchangeClient(req: Request, res: Response, next: NextFunction) {
+    const clientType: string = req.params.exchange
     res.locals.exchangeClient = this.exchangeClientFactory.getByType(clientType)
     next()
   }
@@ -53,7 +57,8 @@ class OrderRouter {
    * endpoints.
    */
   init() {
-    this.router.use(this.initialiseClient.bind(this))
+    // Make sure we've got an exchange client for the request handling.
+    this.router.use(this.initialiseExchangeClient.bind(this))
     this.router.get('/', this.query)
     this.router.post('/', this.create)
     this.router.get('/:id', this.get)

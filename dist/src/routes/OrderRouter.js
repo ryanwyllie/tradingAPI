@@ -10,8 +10,11 @@ class OrderRouter {
         this.router = express_1.Router();
         this.init();
     }
-    initialiseClient(req, res, next) {
-        let clientType = req.params.exchange;
+    getRouter() {
+        return this.router;
+    }
+    initialiseExchangeClient(req, res, next) {
+        const clientType = req.params.exchange;
         res.locals.exchangeClient = this.exchangeClientFactory.getByType(clientType);
         next();
     }
@@ -44,7 +47,8 @@ class OrderRouter {
      * endpoints.
      */
     init() {
-        this.router.use(this.initialiseClient.bind(this));
+        // Make sure we've got an exchange client for the request handling.
+        this.router.use(this.initialiseExchangeClient.bind(this));
         this.router.get('/', this.query);
         this.router.post('/', this.create);
         this.router.get('/:id', this.get);

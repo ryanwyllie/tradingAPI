@@ -29,8 +29,8 @@ class App {
     /* This is just to get up and running, and to make sure what we've got is
      * working so far. This function will change when we start to add more
      * API endpoints */
-    let router = express.Router()
-    let orderRouter = new OrderRouter(new ExchangeClientFactory())
+    const router = express.Router()
+    const orderRouter = new OrderRouter(new ExchangeClientFactory())
     // placeholder route handler
     router.get('/', (req, res, next) => {
       res.json({
@@ -38,7 +38,7 @@ class App {
       });
     });
     this.express.use('/', router);
-    this.express.use('/orders', orderRouter.router);
+    this.express.use('/orders', orderRouter.getRouter());
   }
 
 }
