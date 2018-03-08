@@ -4,9 +4,10 @@ const express = require("express");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const OrderRouter_1 = require("./routes/OrderRouter");
+const ExchangeClientFactory_1 = require("./factories/ExchangeClientFactory");
 // Creates and configures an ExpressJS web server.
 class App {
-    //Run configuration methods on the Express instance.
+    // Run configuration methods on the Express instance.
     constructor() {
         this.express = express();
         this.middleware();
@@ -16,7 +17,6 @@ class App {
     middleware() {
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: false }));
     }
     // Configure API endpoints.
     routes() {
@@ -24,6 +24,7 @@ class App {
          * working so far. This function will change when we start to add more
          * API endpoints */
         let router = express.Router();
+        let orderRouter = new OrderRouter_1.default(new ExchangeClientFactory_1.default());
         // placeholder route handler
         router.get('/', (req, res, next) => {
             res.json({
@@ -31,7 +32,7 @@ class App {
             });
         });
         this.express.use('/', router);
-        this.express.use('/orders', OrderRouter_1.default);
+        this.express.use('/orders', orderRouter.router);
     }
 }
 exports.default = new App().express;

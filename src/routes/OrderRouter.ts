@@ -1,21 +1,51 @@
 import {Router, Request, Response, NextFunction} from 'express';
+import ExchangeClientFactoryInterface from '../factories/ExchangeClientFactoryInterface'
 
 class OrderRouter {
   router: Router
+  exchangeClientFactory: ExchangeClientFactoryInterface
 
   /**
-   * Initialize the HeroRouter
+   * Initialize the OrderRouter
    */
-  constructor() {
+  constructor(exchangeClientFactory: ExchangeClientFactoryInterface) {
+    this.exchangeClientFactory = exchangeClientFactory
     this.router = Router();
     this.init();
   }
 
+  public initialiseClient(req: Request, res: Response, next: NextFunction) {
+    let clientType: string = req.params.exchange
+    res.locals.exchangeClient = this.exchangeClientFactory.getByType(clientType)
+    next()
+  }
+
   /**
-   * GET all Heroes.
+   * GET all orders.
    */
-  public getAll(req: Request, res: Response, next: NextFunction) {
-    res.send(['test1', 'test2']);
+  public query(req: Request, res: Response, next: NextFunction) {
+    res.send(res.locals.exchangeClient.createOrder())
+  }
+
+  /**
+   * GET a single order.
+   */
+  public get(req: Request, res: Response, next: NextFunction) {
+    res.send(['test1', 'test2'])
+  }
+
+  /**
+   * POST create an order.
+   */
+  public create(req: Request, res: Response, next: NextFunction) {
+    res.send(['test1', 'test2'])
+  }
+
+  /**
+   * DELETE all orders.
+   */
+  public delete(req: Request, res: Response, next: NextFunction) {
+    res.send(['test1', 'test2'])
   }
 
   /**
@@ -23,9 +53,13 @@ class OrderRouter {
    * endpoints.
    */
   init() {
-    this.router.get('/', this.getAll);
+    this.router.use(this.initialiseClient.bind(this))
+    this.router.get('/', this.query)
+    this.router.post('/', this.create)
+    this.router.get('/:id', this.get)
+    this.router.delete('/:id', this.delete)
   }
 
 }
 
-export default new OrderRouter().router;
+export default OrderRouter

@@ -3,6 +3,7 @@ import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 import OrderRouter from './routes/OrderRouter'
+import ExchangeClientFactory from './factories/ExchangeClientFactory'
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -10,18 +11,17 @@ class App {
   // ref to Express instance
   public express: express.Application;
 
-  //Run configuration methods on the Express instance.
+  // Run configuration methods on the Express instance.
   constructor() {
-    this.express = express();
-    this.middleware();
-    this.routes();
+    this.express = express()
+    this.middleware()
+    this.routes()
   }
 
   // Configure Express middleware.
   private middleware(): void {
-    this.express.use(logger('dev'));
-    this.express.use(bodyParser.json());
-    this.express.use(bodyParser.urlencoded({ extended: false }));
+    this.express.use(logger('dev'))
+    this.express.use(bodyParser.json())
   }
 
   // Configure API endpoints.
@@ -29,7 +29,8 @@ class App {
     /* This is just to get up and running, and to make sure what we've got is
      * working so far. This function will change when we start to add more
      * API endpoints */
-    let router = express.Router();
+    let router = express.Router()
+    let orderRouter = new OrderRouter(new ExchangeClientFactory())
     // placeholder route handler
     router.get('/', (req, res, next) => {
       res.json({
@@ -37,7 +38,7 @@ class App {
       });
     });
     this.express.use('/', router);
-    this.express.use('/orders', OrderRouter);
+    this.express.use('/orders', orderRouter.router);
   }
 
 }
